@@ -1,50 +1,71 @@
-import { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import {
+    useGetPokemonQuery,
+    useGetPokemonByIdQuery,
+} from '../../services/pokemonApi';
 
-import { fetchPokemon } from './pokemonSlice';
+function PokemonItem({ pokemon }) {
 
-function PokemonList() {
-    const dispatch = useDispatch();
+    const id = pokemon.url.split('/').filter(Boolean).pop();
 
     const {
-        data: pokemon,
-        loading,
+        data,
         error,
-    } = useSelector((state) => state.pokemon);
+        isLoading,
+    } = useGetPokemonByIdQuery(id);
 
-    useEffect(() => {
-        dispatch(fetchPokemon(20));
-    }, [dispatch]);
-
-    if (loading) {
-        return <h2>Loading Pokémon...</h2>;
+    if (isLoading) {
+        return <p>Loading {pokemon.name}...</p>;
     }
 
     if (error) {
-        return <h2>Error: {error}</h2>;
+        return <p>Error loading {pokemon.name}</p>;
     }
 
     return (
-        <div className="pokemon-grid">
-            {pokemon.map((item) => (
-                <article className="pokemon-card" key={item.id}>
-                    <img
-                        src={item.sprites.front_default}
-                        alt={item.name}
-                    />
+        <article>
+            <h2>
+                #{data.id} {data.name}
+            </h2>
 
-                    <h2>
-                        #{item.id} {item.name}
-                    </h2>
+            <img
+                src={data.sprites.front_default}
+                alt={data.name}
+            />
 
-                    <div className="types">
-                        {item.types.map((type) => (
-                            <span key={type.type.name}>
-                                {type.type.name}
-                            </span>
-                        ))}
-                    </div>
-                </article>
+            <p>
+                Height: {data.height}
+            </p>
+
+            <p>
+                Weight: {data.weight}
+            </p>
+        </article>
+    );
+}
+
+function PokemonList() {
+
+    const {
+        data,
+        error,
+        isLoading,
+    } = useGetPokemonQuery(20);
+
+    if (isLoading) {
+        return <p>Loading Pokémon list...</p>;
+    }
+
+    if (error) {
+        return <p>Error loading Pokémon list</p>;
+    }
+
+    return (
+        <div>
+            {data.results.map((pokemon) => (
+                <PokemonItem
+                    key={pokemon.name}
+                    pokemon={pokemon}
+                />
             ))}
         </div>
     );
