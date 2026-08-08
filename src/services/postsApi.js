@@ -7,13 +7,9 @@ export const postsApi = createApi({
         baseUrl: 'http://localhost:3000/',
     }),
 
-    tagTypes: ['Posts'],
-
     endpoints: (builder) => ({
         getPosts: builder.query({
             query: () => 'posts',
-
-            providesTags: ['Posts'],
         }),
 
         getPostById: builder.query({
@@ -27,7 +23,31 @@ export const postsApi = createApi({
                 body: post,
             }),
 
-            invalidatesTags: ['Posts'],
+            async onQueryStarted(
+                post,
+                { dispatch, queryFulfilled }
+            ) {
+                try {
+                    const { data: createdPost } =
+                        await queryFulfilled;
+
+                    dispatch(
+                        postsApi.util.updateQueryData(
+                            'getPosts',
+                            undefined,
+                            (draft) => {
+                                draft.push(createdPost);
+                            }
+                        )
+                    );
+
+                } catch (error) {
+                    console.error(
+                        'Error creating post:',
+                        error
+                    );
+                }
+            },
         }),
     }),
 });
