@@ -1,4 +1,7 @@
-import PokemonList from './features/pokemon/PokemonList';
+// import PokemonList from './features/pokemon/PokemonList';
+import AddPost from './features/posts/AddPost';
+import PostById from './features/posts/PostById';
+import Posts from './features/posts/Posts';
 
 function App() {
     return (
@@ -7,8 +10,12 @@ function App() {
                 <h1>Pokédex</h1>
                 <p>React + Redux Toolkit + PokéAPI</p>
             </header>
+            
+            <AddPost />
 
-            <PokemonList />
+            <PostById />
+
+            <Posts />
         </main>
     );
 }
